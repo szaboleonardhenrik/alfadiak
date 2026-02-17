@@ -1,256 +1,825 @@
 <!DOCTYPE html>
-<html lang="hu">
+<html lang="hu" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Alfa Diák</title>
+  <title>Alfa Diák – Az Alfa Generáció</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <style>
-    *, *::before, *::after {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --bg: #0a0a0a;
-      --surface: #111111;
-      --accent: #e8ff47;
-      --text: #f0ede6;
-      --muted: #555;
+      --gold: #D29B01;
+      --blue: #2F6482;
+      --teal: #46A0A0;
+      --gold-light: rgba(210,155,1,0.12);
+      --teal-light: rgba(70,160,160,0.12);
+      --blue-light: rgba(47,100,130,0.14);
+      --radius: 12px;
+      --radius-lg: 20px;
     }
 
-    html, body {
-      height: 100%;
+    [data-theme="dark"] {
+      --bg: #0f1117;
+      --bg2: #161b24;
+      --bg3: #1c2330;
+      --border: rgba(255,255,255,0.07);
+      --text: #f0ede6;
+      --text-muted: rgba(240,237,230,0.52);
+      --text-faint: rgba(240,237,230,0.22);
+      --card-bg: rgba(255,255,255,0.03);
+      --nav-bg: rgba(15,17,23,0.88);
+      --shadow: 0 4px 32px rgba(0,0,0,0.4);
+    }
+
+    [data-theme="light"] {
+      --bg: #f8f6f1;
+      --bg2: #ffffff;
+      --bg3: #f0ede4;
+      --border: rgba(0,0,0,0.08);
+      --text: #1a1a1a;
+      --text-muted: rgba(26,26,26,0.56);
+      --text-faint: rgba(26,26,26,0.22);
+      --card-bg: rgba(0,0,0,0.02);
+      --nav-bg: rgba(248,246,241,0.92);
+      --shadow: 0 4px 32px rgba(0,0,0,0.08);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
       background: var(--bg);
       color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      overflow: hidden;
+      font-family: 'Manrope', sans-serif;
+      transition: background 0.3s, color 0.3s;
+      line-height: 1.6;
     }
 
-    /* Grain overlay */
-    body::before {
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      background: var(--nav-bg);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 clamp(1.5rem, 5vw, 4rem);
+      height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: background 0.3s;
+    }
+
+    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .logo-mark {
+      width: 32px; height: 32px; background: var(--gold); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.15rem;
+      color: #fff; flex-shrink: 0;
+    }
+    .logo-text { font-weight: 700; font-size: 0.97rem; color: var(--text); letter-spacing: -0.01em; }
+
+    .nav-right { display: flex; align-items: center; gap: 1.2rem; }
+
+    .lang-toggle {
+      display: flex; align-items: center;
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 100px; padding: 3px; gap: 2px;
+    }
+    .lang-btn {
+      padding: 4px 12px; border-radius: 100px; border: none;
+      background: transparent; font-family: 'Manrope', sans-serif;
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em;
+      color: var(--text-muted); cursor: pointer; transition: all 0.2s;
+    }
+    .lang-btn.active { background: var(--gold); color: #fff; }
+
+    .theme-btn {
+      width: 36px; height: 36px; border-radius: 50%;
+      border: 1px solid var(--border); background: var(--card-bg);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; transition: all 0.2s; color: var(--text);
+    }
+    .theme-btn:hover { border-color: var(--gold); }
+
+    /* HERO */
+    #hero {
+      padding-top: 64px; min-height: 100vh;
+      display: flex; align-items: center;
+      background: var(--bg); position: relative; overflow: hidden;
+    }
+    [data-theme="dark"] #hero::before {
       content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      position: absolute; top: -150px; right: -150px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(210,155,1,0.055) 0%, transparent 70%);
       pointer-events: none;
-      z-index: 100;
-      opacity: 0.5;
     }
-
-    /* Background glow */
-    .glow {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(120px);
+    [data-theme="dark"] #hero::after {
+      content: '';
+      position: absolute; bottom: -150px; left: -100px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(70,160,160,0.045) 0%, transparent 70%);
       pointer-events: none;
-      z-index: 0;
-    }
-    .glow-1 {
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(circle, rgba(232,255,71,0.07) 0%, transparent 70%);
-      top: -100px;
-      right: -50px;
-      animation: drift1 12s ease-in-out infinite alternate;
-    }
-    .glow-2 {
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%);
-      bottom: 0;
-      left: -100px;
-      animation: drift2 15s ease-in-out infinite alternate;
     }
 
-    @keyframes drift1 {
-      from { transform: translate(0, 0); }
-      to   { transform: translate(-30px, 40px); }
-    }
-    @keyframes drift2 {
-      from { transform: translate(0, 0); }
-      to   { transform: translate(40px, -30px); }
+    .hero-inner {
+      width: 100%; max-width: 1200px; margin: 0 auto;
+      padding: clamp(3rem, 7vw, 6rem) clamp(1.5rem, 5vw, 4rem);
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;
     }
 
-    /* Main layout */
-    main {
-      position: relative;
-      z-index: 1;
-      height: 100vh;
-      display: grid;
-      grid-template-rows: 1fr auto;
-      padding: clamp(2rem, 6vw, 5rem);
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 5px 14px; border: 1px solid rgba(210,155,1,0.35);
+      border-radius: 100px; font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold);
+      margin-bottom: 1.8rem; animation: fadeUp 0.7s 0.1s ease both;
+    }
+    .hero-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--gold); animation: pulse 2s infinite;
     }
 
-    .center {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: flex-start;
+    .hero-title {
+      font-family: 'Playfair Display', serif; font-weight: 800;
+      font-size: clamp(2.8rem, 5.5vw, 4.5rem); line-height: 1.08;
+      letter-spacing: -0.02em; margin-bottom: 1.5rem;
+      animation: fadeUp 0.8s 0.2s ease both;
+    }
+    .hero-title em { font-style: italic; color: var(--gold); }
+
+    .hero-desc {
+      font-size: 1.03rem; line-height: 1.75; color: var(--text-muted);
+      margin-bottom: 2.5rem; animation: fadeUp 0.8s 0.35s ease both;
     }
 
-    /* Eyebrow */
-    .eyebrow {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 2rem;
-      opacity: 0;
-      animation: fadeUp 0.8s 0.2s ease forwards;
+    .hero-cta {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 0.85rem 2rem; background: var(--gold); color: #fff;
+      border-radius: 100px; text-decoration: none; font-weight: 700;
+      font-size: 0.88rem; letter-spacing: 0.02em;
+      transition: all 0.25s; animation: fadeUp 0.8s 0.5s ease both;
     }
-    .eyebrow-line {
-      width: 40px;
-      height: 1px;
-      background: var(--accent);
-    }
-    .eyebrow-text {
-      font-size: 0.7rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--accent);
-      font-weight: 300;
-    }
+    .hero-cta:hover { background: #b88e00; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(210,155,1,0.3); }
 
-    /* Headline */
-    .headline {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(5rem, 15vw, 14rem);
-      line-height: 0.9;
-      letter-spacing: -0.02em;
-      opacity: 0;
-      animation: fadeUp 0.9s 0.4s ease forwards;
-    }
+    .hero-right { animation: fadeUp 0.9s 0.3s ease both; }
 
-    .headline .word-alfa {
-      display: block;
-      color: var(--text);
-    }
+    .hero-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 
-    .headline .word-diak {
-      display: block;
-      color: transparent;
-      -webkit-text-stroke: 1.5px var(--accent);
+    .hero-stat {
+      padding: 1.4rem 1.5rem; background: var(--bg2);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      transition: border-color 0.25s;
     }
+    .hero-stat:hover { border-color: rgba(210,155,1,0.4); }
+    .hero-stat.wide {
+      grid-column: 1 / -1;
+      display: flex; align-items: center; gap: 1.5rem;
+      background: linear-gradient(135deg, rgba(210,155,1,0.07), rgba(210,155,1,0.02));
+      border-color: rgba(210,155,1,0.18);
+    }
+    .hero-stat-big {
+      font-family: 'Playfair Display', serif; font-size: 2.6rem;
+      font-weight: 700; color: var(--gold); line-height: 1; white-space: nowrap;
+    }
+    .hero-stat-num {
+      font-family: 'Playfair Display', serif; font-size: 2rem;
+      font-weight: 700; line-height: 1; margin-bottom: 0.3rem;
+    }
+    .c-teal { color: var(--teal); }
+    .c-blue { color: var(--blue); }
+    .hero-stat-label { font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; font-weight: 500; }
 
-    /* Tagline */
-    .tagline {
-      margin-top: 2.5rem;
-      font-family: 'DM Serif Display', serif;
-      font-style: italic;
-      font-size: clamp(1rem, 2.5vw, 1.5rem);
-      color: var(--muted);
-      max-width: 420px;
-      line-height: 1.5;
-      opacity: 0;
-      animation: fadeUp 0.9s 0.6s ease forwards;
-    }
+    /* LAYOUT */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 clamp(1.5rem, 5vw, 4rem); }
+    .section { padding: clamp(4rem, 8vw, 7rem) 0; }
+    .section-alt { background: var(--bg2); }
+    .divider { height: 1px; background: var(--border); }
 
-    /* Decorative number */
-    .deco-num {
-      position: fixed;
-      right: clamp(2rem, 6vw, 5rem);
-      top: 50%;
-      transform: translateY(-50%);
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(8rem, 18vw, 22rem);
-      color: transparent;
-      -webkit-text-stroke: 1px rgba(255,255,255,0.04);
-      pointer-events: none;
-      z-index: 0;
-      user-select: none;
-      opacity: 0;
-      animation: fadeIn 1.2s 0.8s ease forwards;
+    .section-label {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--teal); margin-bottom: 0.9rem;
     }
+    .section-label::before { content: ''; width: 22px; height: 2px; background: var(--teal); border-radius: 2px; }
 
-    /* Bottom bar */
-    .bottom {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding-top: 2rem;
-      border-top: 1px solid rgba(255,255,255,0.06);
-      opacity: 0;
-      animation: fadeUp 0.8s 1s ease forwards;
+    .section-title {
+      font-family: 'Playfair Display', serif; font-weight: 700;
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem); line-height: 1.18;
+      letter-spacing: -0.02em; margin-bottom: 0.9rem;
     }
+    .section-desc { font-size: 1rem; line-height: 1.72; color: var(--text-muted); max-width: 560px; }
+    .section-header { margin-bottom: 2.8rem; }
 
-    .bottom-left {
-      font-size: 0.65rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
+    /* KIK ŐK */
+    .kik-grid { display: grid; grid-template-columns: 1fr 1.15fr; gap: 4rem; align-items: start; }
 
-    .status-dot {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.65rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-    .dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      animation: pulse 2s ease infinite;
-    }
+    .kik-body p { font-size: 0.96rem; line-height: 1.8; color: var(--text-muted); margin-bottom: 0.9rem; }
+    .kik-body p strong { color: var(--text); font-weight: 600; }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50%       { opacity: 0.5; transform: scale(0.8); }
+    .kik-cards { border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+    .kik-card {
+      padding: 1.4rem 1.8rem; border-bottom: 1px solid var(--border);
+      display: flex; gap: 1.5rem; align-items: flex-start;
+      background: var(--bg2); transition: background 0.2s;
     }
+    .kik-card:last-child { border-bottom: none; }
+    .kik-card:hover { background: var(--bg3); }
+    .kik-year {
+      font-family: 'Playfair Display', serif; font-size: 1.5rem;
+      font-weight: 700; color: var(--gold); line-height: 1; white-space: nowrap; padding-top: 2px;
+    }
+    .kik-card h4 { font-weight: 700; font-size: 0.92rem; margin-bottom: 0.25rem; }
+    .kik-card p { font-size: 0.8rem; color: var(--text-muted); line-height: 1.55; }
 
+    /* STATS */
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+
+    .stat-card {
+      padding: 1.8rem; background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); transition: all 0.25s;
+      position: relative; overflow: hidden;
+    }
+    .stat-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    }
+    .stat-card:nth-child(3n+1)::before { background: var(--gold); }
+    .stat-card:nth-child(3n+2)::before { background: var(--teal); }
+    .stat-card:nth-child(3n)::before   { background: var(--blue); }
+    .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); border-color: rgba(210,155,1,0.3); }
+
+    .stat-num {
+      font-family: 'Playfair Display', serif; font-weight: 700;
+      font-size: 2.2rem; line-height: 1; margin-bottom: 0.5rem;
+    }
+    .stat-card:nth-child(3n+1) .stat-num { color: var(--gold); }
+    .stat-card:nth-child(3n+2) .stat-num { color: var(--teal); }
+    .stat-card:nth-child(3n)   .stat-num { color: var(--blue); }
+    .stat-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 0.35rem; }
+    .stat-desc  { font-size: 0.78rem; color: var(--text-muted); line-height: 1.55; }
+
+    /* TRAITS */
+    .traits-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+
+    .trait-card {
+      padding: 1.8rem; background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); transition: all 0.25s;
+    }
+    .trait-card:hover { border-color: var(--teal); box-shadow: var(--shadow); }
+    .trait-icon {
+      width: 42px; height: 42px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; margin-bottom: 1.1rem;
+    }
+    .trait-card:nth-child(3n+1) .trait-icon { background: var(--teal-light); }
+    .trait-card:nth-child(3n+2) .trait-icon { background: var(--gold-light); }
+    .trait-card:nth-child(3n)   .trait-icon { background: var(--blue-light); }
+    .trait-card h3 { font-weight: 700; font-size: 0.94rem; margin-bottom: 0.45rem; }
+    .trait-card p  { font-size: 0.8rem; color: var(--text-muted); line-height: 1.6; }
+
+    /* QUOTE */
+    .quote-block {
+      border-left: 4px solid var(--gold); padding: 1.8rem 2.2rem;
+      background: var(--bg2); border-radius: 0 var(--radius-lg) var(--radius-lg) 0; margin: 3rem 0;
+    }
+    .quote-block blockquote {
+      font-family: 'Playfair Display', serif; font-style: italic;
+      font-size: clamp(1.05rem, 2.2vw, 1.4rem); line-height: 1.6; color: var(--text); margin-bottom: 0.8rem;
+    }
+    .quote-block cite { font-size: 0.75rem; font-style: normal; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
+
+    /* TIMELINE */
+    .timeline-list { display: flex; flex-direction: column; position: relative; }
+    .timeline-list::before {
+      content: ''; position: absolute; left: 96px; top: 8px; bottom: 8px;
+      width: 1px; background: linear-gradient(180deg, var(--gold), var(--teal) 70%, transparent);
+    }
+    .tl-row { display: grid; grid-template-columns: 96px 1fr; gap: 2.5rem; padding: 1.4rem 0; position: relative; }
+    .tl-row::before {
+      content: ''; position: absolute; left: 92px; top: 1.75rem;
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--bg2); border: 2px solid var(--gold);
+    }
+    .tl-row:last-child::before { background: var(--gold); }
+    .tl-yr { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 0.88rem; color: var(--gold); text-align: right; padding-top: 2px; line-height: 1.3; }
+    .tl-body h4 { font-weight: 700; font-size: 0.93rem; margin-bottom: 0.25rem; }
+    .tl-body p  { font-size: 0.8rem; color: var(--text-muted); line-height: 1.55; }
+
+    /* JÖVŐ */
+    .jovo-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 4rem; align-items: start; }
+    .jovo-text p { font-size: 0.96rem; line-height: 1.8; color: var(--text-muted); margin-bottom: 0.9rem; }
+    .jovo-text p strong { color: var(--text); font-weight: 600; }
+
+    .jovo-list { display: flex; flex-direction: column; gap: 0.9rem; }
+    .jovo-item {
+      display: flex; gap: 1rem; align-items: flex-start;
+      padding: 1.1rem 1.4rem; background: var(--bg2);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      transition: border-color 0.2s;
+    }
+    .jovo-item:hover { border-color: var(--teal); }
+    .jovo-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); margin-top: 5px; flex-shrink: 0; }
+    .jovo-item h4 { font-weight: 700; font-size: 0.87rem; margin-bottom: 0.2rem; }
+    .jovo-item p  { font-size: 0.77rem; color: var(--text-muted); line-height: 1.5; }
+
+    /* TUDATOS */
+    .tudatos-block {
+      display: grid; grid-template-columns: 1fr auto; gap: 3rem; align-items: center;
+      padding: clamp(2rem, 4vw, 3rem) clamp(2rem, 4vw, 3.5rem);
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); position: relative; overflow: hidden;
+    }
+    .tudatos-block::after {
+      content: ''; position: absolute; top: 0; right: 0; bottom: 0;
+      width: 4px; background: linear-gradient(180deg, var(--gold), var(--teal));
+    }
+    .tudatos-label { font-size: 0.67rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; }
+    .tudatos-block h3 { font-family: 'Playfair Display', serif; font-size: clamp(1.2rem, 2.5vw, 1.75rem); font-weight: 700; margin-bottom: 0.7rem; }
+    .tudatos-block p  { font-size: 0.88rem; color: var(--text-muted); line-height: 1.65; max-width: 520px; }
+    .tudatos-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 0.8rem 1.8rem; border: 1.5px solid var(--border);
+      border-radius: 100px; text-decoration: none; font-weight: 700;
+      font-size: 0.82rem; color: var(--text); white-space: nowrap; transition: all 0.25s;
+    }
+    .tudatos-btn:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-light); }
+    .tudatos-btn svg { width: 14px; height: 14px; }
+
+    /* FOOTER */
+    footer {
+      padding: 1.8rem clamp(1.5rem, 5vw, 4rem);
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+    }
+    footer p { font-size: 0.72rem; color: var(--text-faint); }
+
+    /* LANG */
+    [data-lang="en"] { display: none; }
+    body.lang-en [data-lang="hu"] { display: none; }
+    body.lang-en [data-lang="en"] { display: revert; }
+
+    /* ANIMATIONS */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(20px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
+    @keyframes pulse {
+      0%,100% { opacity: 1; } 50% { opacity: 0.4; }
     }
 
-    /* Mobile */
-    @media (max-width: 600px) {
-      .deco-num { display: none; }
-      html, body { overflow: auto; }
-      main { height: auto; min-height: 100vh; }
+    .reveal { opacity: 0; transform: translateY(22px); transition: opacity 0.65s ease, transform 0.65s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-d1 { transition-delay: 0.1s; }
+    .reveal-d2 { transition-delay: 0.2s; }
+    .reveal-d3 { transition-delay: 0.3s; }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .hero-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+      .hero-right { order: -1; }
+      .kik-grid, .jovo-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .stats-grid  { grid-template-columns: 1fr 1fr; }
+      .traits-grid { grid-template-columns: 1fr 1fr; }
+      .tudatos-block { grid-template-columns: 1fr; gap: 1.5rem; }
+    }
+    @media (max-width: 580px) {
+      .stats-grid, .traits-grid { grid-template-columns: 1fr; }
+      .hero-stat-grid { grid-template-columns: 1fr; }
+      .hero-stat.wide { flex-direction: column; gap: 0.5rem; }
+      .timeline-list::before { left: 62px; }
+      .tl-row { grid-template-columns: 62px 1fr; gap: 1.5rem; }
+      .tl-row::before { left: 58px; }
+      footer { flex-direction: column; text-align: center; }
     }
   </style>
 </head>
 <body>
 
-  <div class="glow glow-1"></div>
-  <div class="glow glow-2"></div>
-  <div class="deco-num" aria-hidden="true">α</div>
-
-  <main>
-    <div class="center">
-      <div class="eyebrow">
-        <div class="eyebrow-line"></div>
-        <span class="eyebrow-text">Hamarosan</span>
-      </div>
-
-      <h1 class="headline">
-        <span class="word-alfa">Alfa</span>
-        <span class="word-diak">Diák</span>
-      </h1>
-
-      <p class="tagline">Valami nagy készül.<br>Érdemes figyelni.</p>
+<nav>
+  <a href="#" class="logo">
+    <div class="logo-mark">α</div>
+    <span class="logo-text">Alfa Diák</span>
+  </a>
+  <div class="nav-right">
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('hu')" id="btn-hu">HU</button>
+      <button class="lang-btn" onclick="setLang('en')" id="btn-en">EN</button>
     </div>
+    <button class="theme-btn" onclick="toggleTheme()" id="theme-btn" title="Téma">🌙</button>
+  </div>
+</nav>
 
-    <footer class="bottom">
-      <span class="bottom-left">© 2025 Alfa Diák</span>
-      <span class="status-dot">
-        <span class="dot"></span>
-        Fejlesztés alatt
-      </span>
-    </footer>
-  </main>
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-eyebrow">
+        <div class="hero-dot"></div>
+        <span data-lang="hu">2010–2024 · Magyar perspektíva</span>
+        <span data-lang="en">2010–2024 · Hungarian perspective</span>
+      </div>
+      <h1 class="hero-title">
+        <span data-lang="hu">Az <em>Alfa</em><br>Generáció</span>
+        <span data-lang="en">The <em>Alpha</em><br>Generation</span>
+      </h1>
+      <p class="hero-desc" data-lang="hu">Magyarország jövőjének formálói. Az első generáció, amely teljes egészében a digitális korban született – és 2035-re belép a munkaerőpiacra.</p>
+      <p class="hero-desc" data-lang="en">The shapers of Hungary's future. The first generation born entirely in the digital age – entering the labour market by 2035.</p>
 
+    </div>
+    <div class="hero-right">
+      <div class="hero-stat-grid">
+        <div class="hero-stat wide">
+          <div class="hero-stat-big">~380 000</div>
+          <div>
+            <div class="hero-stat-label" data-lang="hu">Alfa generációs él Magyarországon<br><small style="opacity:.6;font-size:.9em">KSH, 2024</small></div>
+            <div class="hero-stat-label" data-lang="en">Alpha generation members in Hungary<br><small style="opacity:.6;font-size:.9em">KSH, 2024</small></div>
+          </div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num c-teal">65%</div>
+          <div class="hero-stat-label" data-lang="hu">Ismeretlen szakmák várják őket</div>
+          <div class="hero-stat-label" data-lang="en">Will work in yet-unknown jobs</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num c-blue">2035</div>
+          <div class="hero-stat-label" data-lang="hu">Belépés a munkaerőpiacra</div>
+          <div class="hero-stat-label" data-lang="en">Labour market entry year</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- KIK ŐK -->
+<section id="kik-ok" class="section">
+  <div class="container">
+    <div class="kik-grid">
+      <div>
+        <div class="section-header reveal">
+          <div class="section-label" data-lang="hu">Definíció</div>
+          <div class="section-label" data-lang="en">Definition</div>
+          <h2 class="section-title" data-lang="hu">Kik az Alfa generáció tagjai?</h2>
+          <h2 class="section-title" data-lang="en">Who are the Alpha Generation?</h2>
+        </div>
+        <div class="kik-body reveal reveal-d1">
+          <p data-lang="hu"><strong>2010 és 2024 között születtek</strong> – ők a 21. század első valódi generációja. A fogalmat Mark McCrindle ausztrál demográfus alkotta, miután a Z betű után elfogyta a latin ábécé.</p>
+          <p data-lang="en"><strong>Born between 2010 and 2024</strong> – they are the first true generation of the 21st century. The term was coined by Australian demographer Mark McCrindle after the Latin alphabet ran out after Z.</p>
+          <p data-lang="hu">Magyarországon ez az a korosztály, amely már <strong>iPaddel és okostelefonnal a kézben nőtt fel.</strong> A KSH adatai szerint 2023-ban hazánkban körülbelül <strong>100 000 Alfa generációs gyermek</strong> él általános iskolás korban.</p>
+          <p data-lang="en">In Hungary, this is the generation that <strong>grew up with iPads and smartphones in hand.</strong> According to KSH data, around <strong>100,000 Alpha generation children</strong> are of primary school age in Hungary in 2023.</p>
+          <p data-lang="hu">A UNICEF becslései szerint <strong>2025-re globálisan elérik a 2 milliárd főt</strong> – ők lesznek valaha a legnépesebb generáció a Földön.</p>
+          <p data-lang="en">According to UNICEF estimates, <strong>they will reach 2 billion globally by 2025</strong> – making them the most populous generation in history.</p>
+        </div>
+      </div>
+      <div class="kik-cards reveal reveal-d2">
+        <div class="kik-card">
+          <div class="kik-year">2010</div>
+          <div>
+            <h4 data-lang="hu">A generáció kezdete</h4>
+            <h4 data-lang="en">Generation starts</h4>
+            <p data-lang="hu">Egybeesik az iPad és az Instagram megjelenésével. Az első "igazi" Alfák születnek Magyarországon.</p>
+            <p data-lang="en">Coincides with the launch of iPad and Instagram. The first "true" Alphas are born in Hungary.</p>
+          </div>
+        </div>
+        <div class="kik-card">
+          <div class="kik-year">2016</div>
+          <div>
+            <h4 data-lang="hu">Digitális transzformáció csúcsa</h4>
+            <h4 data-lang="en">Peak of digital transformation</h4>
+            <p data-lang="hu">A magyar iskolák megkezdik az oktatástechnológiai eszközök bevezetését az osztálytermekben.</p>
+            <p data-lang="en">Hungarian schools begin introducing educational technology tools into classrooms.</p>
+          </div>
+        </div>
+        <div class="kik-card">
+          <div class="kik-year">2020</div>
+          <div>
+            <h4 data-lang="hu">A COVID-generáció</h4>
+            <h4 data-lang="en">The COVID generation</h4>
+            <p data-lang="hu">Az Alfa fiatalabb tagjai a pandémia alatt kezdték az iskolát – digitális osztálytermekben, otthonról. Ez alapvetően formálta tanulási stílusukat.</p>
+            <p data-lang="en">Younger Alphas started school during the pandemic – in digital classrooms, from home. This fundamentally shaped their learning style.</p>
+          </div>
+        </div>
+        <div class="kik-card">
+          <div class="kik-year">2024</div>
+          <div>
+            <h4 data-lang="hu">A generáció vége</h4>
+            <h4 data-lang="en">Generation ends</h4>
+            <p data-lang="hu">Az utolsó Alfák születnek. A legidősebbek 14 évesek – aktív internethasználók és tartalmak alkotói.</p>
+            <p data-lang="en">The last Alphas are born. The oldest are 14 – already active internet users and content creators.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- STATS -->
+<section id="stats" class="section section-alt">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label" data-lang="hu">Magyar adatok</div>
+      <div class="section-label" data-lang="en">Hungarian data</div>
+      <h2 class="section-title" data-lang="hu">Az Alfa generáció Magyarországon</h2>
+      <h2 class="section-title" data-lang="en">The Alpha Generation in Hungary</h2>
+      <p class="section-desc" data-lang="hu">KSH, OECD és UNICEF adatok alapján – a generáció hatása a magyar társadalomra és gazdaságra.</p>
+      <p class="section-desc" data-lang="en">Based on KSH, OECD and UNICEF data – the generation's impact on Hungarian society and the economy.</p>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card reveal reveal-d1">
+        <div class="stat-num">~380e</div>
+        <div class="stat-title" data-lang="hu">Alfa generációs Magyarországon</div>
+        <div class="stat-title" data-lang="en">Alpha members in Hungary</div>
+        <div class="stat-desc" data-lang="hu">KSH 2024-es becslés a 0–14 éves korosztályra, figyelembe véve a születési trendeket.</div>
+        <div class="stat-desc" data-lang="en">KSH 2024 estimate for ages 0–14, accounting for birth rate trends.</div>
+      </div>
+      <div class="stat-card reveal reveal-d2">
+        <div class="stat-num">87%</div>
+        <div class="stat-title" data-lang="hu">Internethasználat 10–14 évesek körében</div>
+        <div class="stat-title" data-lang="en">Internet usage among 10–14 year olds</div>
+        <div class="stat-desc" data-lang="hu">A KSH 2023-as digitális gazdaság adatfelvétele szerint a magyar 10–14 évesek 87%-a rendszeres internethasználó.</div>
+        <div class="stat-desc" data-lang="en">KSH's 2023 digital economy survey: 87% of Hungarian 10–14 year olds are regular internet users.</div>
+      </div>
+      <div class="stat-card reveal reveal-d3">
+        <div class="stat-num">4,2h</div>
+        <div class="stat-title" data-lang="hu">Napi képernyőidő átlag</div>
+        <div class="stat-title" data-lang="en">Daily screen time average</div>
+        <div class="stat-desc" data-lang="hu">A 10–15 éves korosztály átlagosan 4,2 órát tölt naponta képernyő előtt tanulási célokon kívül.</div>
+        <div class="stat-desc" data-lang="en">10–15 year olds spend an average of 4.2 hours daily on screens outside of educational purposes.</div>
+      </div>
+      <div class="stat-card reveal reveal-d1">
+        <div class="stat-num">2035</div>
+        <div class="stat-title" data-lang="hu">Belépés a magyar munkaerőpiacra</div>
+        <div class="stat-title" data-lang="en">Entry to the Hungarian labour market</div>
+        <div class="stat-desc" data-lang="hu">A legidősebb Alfák 2035 körül jelennek meg – egybeesve a várható AI-alapú munkapiaci átalakulással.</div>
+        <div class="stat-desc" data-lang="en">The oldest Alphas will appear around 2035 – coinciding with expected AI-driven market transformation.</div>
+      </div>
+      <div class="stat-card reveal reveal-d2">
+        <div class="stat-num">61%</div>
+        <div class="stat-title" data-lang="hu">Saját digitális eszköz az általánosban</div>
+        <div class="stat-title" data-lang="en">Own device in primary school</div>
+        <div class="stat-desc" data-lang="hu">A magyar általános iskolások 61%-a rendelkezik saját okostelefonnal vagy tablettel. Az arány évről évre nő.</div>
+        <div class="stat-desc" data-lang="en">61% of Hungarian primary school students have their own smartphone or tablet – a figure that grows yearly.</div>
+      </div>
+      <div class="stat-card reveal reveal-d3">
+        <div class="stat-num">+18%</div>
+        <div class="stat-title" data-lang="hu">Tanulási nehézségek növekedése</div>
+        <div class="stat-title" data-lang="en">Rise in learning difficulties</div>
+        <div class="stat-desc" data-lang="hu">Az OECD 2023-as PISA-jelentése szerint 18%-kal nőtt az olvasási és matematikai nehézségek aránya az Alfa korosztályban a pandémia óta.</div>
+        <div class="stat-desc" data-lang="en">The OECD's 2023 PISA report shows an 18% rise in reading and maths difficulties among Hungarian Alphas since the pandemic.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- JELLEMZŐK -->
+<section id="jellemzok" class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label" data-lang="hu">Jellemzők</div>
+      <div class="section-label" data-lang="en">Characteristics</div>
+      <h2 class="section-title" data-lang="hu">Mi teszi különlegessé őket?</h2>
+      <h2 class="section-title" data-lang="en">What makes them unique?</h2>
+      <p class="section-desc" data-lang="hu">Hat kulcstulajdonság, amely meghatározza az Alfa generáció gondolkodását és viselkedését.</p>
+      <p class="section-desc" data-lang="en">Six key traits defining the Alpha generation's mindset and behaviour.</p>
+    </div>
+    <div class="traits-grid">
+      <div class="trait-card reveal reveal-d1">
+        <div class="trait-icon">📱</div>
+        <h3 data-lang="hu">Digitális anyanyelvűek</h3>
+        <h3 data-lang="en">Digital natives</h3>
+        <p data-lang="hu">Soha nem ismertek okostelefon nélküli világot. A technológia számukra nem eszköz – természetes közeg.</p>
+        <p data-lang="en">They've never known a world without smartphones. Technology isn't a tool – it's a natural medium.</p>
+      </div>
+      <div class="trait-card reveal reveal-d2">
+        <div class="trait-icon">🤖</div>
+        <h3 data-lang="hu">AI-natívak</h3>
+        <h3 data-lang="en">AI-native</h3>
+        <p data-lang="hu">Az első generáció, amely mesterséges intelligenciával nő fel. Az AI számukra mindennapos segítőtárs.</p>
+        <p data-lang="en">The first generation growing up with AI as an everyday assistant, not a novelty.</p>
+      </div>
+      <div class="trait-card reveal reveal-d3">
+        <div class="trait-icon">🧠</div>
+        <h3 data-lang="hu">Vizuális gondolkodók</h3>
+        <h3 data-lang="en">Visual thinkers</h3>
+        <p data-lang="hu">A YouTube és TikTok generációja. Vizuálisan dolgozzák fel az információt, elvárják a vizuális kommunikációt.</p>
+        <p data-lang="en">The YouTube and TikTok generation. They process information visually and expect visual communication.</p>
+      </div>
+      <div class="trait-card reveal reveal-d1">
+        <div class="trait-icon">⚡</div>
+        <h3 data-lang="hu">Azonnali elvárások</h3>
+        <h3 data-lang="en">Instant expectations</h3>
+        <p data-lang="hu">Streaming, azonnali válaszok. Türelmetlenebbek, de gyorsabban is dolgozzák fel az információt.</p>
+        <p data-lang="en">Streaming, instant answers. More impatient, but also faster at processing information.</p>
+      </div>
+      <div class="trait-card reveal reveal-d2">
+        <div class="trait-icon">🌍</div>
+        <h3 data-lang="hu">Globális polgárok</h3>
+        <h3 data-lang="en">Global citizens</h3>
+        <p data-lang="hu">Az internet határtalanná tette a világukat. Természetes számukra a sokszínűség és globális tájékozottság.</p>
+        <p data-lang="en">The internet made their world borderless. Diversity and global awareness come naturally.</p>
+      </div>
+      <div class="trait-card reveal reveal-d3">
+        <div class="trait-icon">💚</div>
+        <h3 data-lang="hu">Értékvezérelt döntések</h3>
+        <h3 data-lang="en">Value-driven decisions</h3>
+        <p data-lang="hu">Fenntarthatóság, felelősség – nem opcionális. Munkáltatót és márkát is értékek alapján választanak.</p>
+        <p data-lang="en">Sustainability and responsibility aren't optional. They choose employers and brands based on values.</p>
+      </div>
+    </div>
+    <div class="quote-block reveal">
+      <blockquote data-lang="hu">„Az Alfa generáció nem csupán a következő generáció – ők az első generáció, amely teljesen új feltételekkel érkezik a világba."</blockquote>
+      <blockquote data-lang="en">"The Alpha generation is not just the next generation – they are the first to arrive under entirely new conditions."</blockquote>
+      <cite>Mark McCrindle – demográfus, az Alfa generáció névadója</cite>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- IDŐSZALAG -->
+<section id="idovonal" class="section section-alt">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label" data-lang="hu">Kontextus</div>
+      <div class="section-label" data-lang="en">Context</div>
+      <h2 class="section-title" data-lang="hu">Generációk Magyarországon</h2>
+      <h2 class="section-title" data-lang="en">Generations in Hungary</h2>
+    </div>
+    <div class="timeline-list">
+      <div class="tl-row reveal">
+        <div class="tl-yr">1946–64</div>
+        <div class="tl-body">
+          <h4 data-lang="hu">Baby Boomerek – A Kádár-kor generációja</h4>
+          <h4 data-lang="en">Baby Boomers – The Kádár era generation</h4>
+          <p data-lang="hu">A szocialista Magyarországon nőttek fel. A rendszerváltás megélői, a hagyományos munkakultúra megalapozói. Ma a nagyszülők.</p>
+          <p data-lang="en">Grew up in socialist Hungary. Lived through the regime change, established traditional work culture. Today's grandparents.</p>
+        </div>
+      </div>
+      <div class="tl-row reveal">
+        <div class="tl-yr">1965–80</div>
+        <div class="tl-body">
+          <h4 data-lang="hu">X Generáció – A rendszerváltás generációja</h4>
+          <h4 data-lang="en">Generation X – The regime change generation</h4>
+          <p data-lang="hu">Fiatalon élték meg a rendszerváltást és az internet hajnalát. Rugalmasak, alkalmazkodóak. A legtöbb Alfa szülője.</p>
+          <p data-lang="en">Experienced the regime change and dawn of the internet. Flexible and adaptive. Most Alphas' parents.</p>
+        </div>
+      </div>
+      <div class="tl-row reveal">
+        <div class="tl-yr">1981–96</div>
+        <div class="tl-body">
+          <h4 data-lang="hu">Millenniálisok – Az átmenet generációja</h4>
+          <h4 data-lang="en">Millennials – The transition generation</h4>
+          <p data-lang="hu">Analógból digitálisba. Az internet és a közösségi média korai adoptálói. A legfiatalabb Alfa-szülők.</p>
+          <p data-lang="en">From analogue to digital. Early adopters of the internet and social media. The youngest Alpha parents.</p>
+        </div>
+      </div>
+      <div class="tl-row reveal">
+        <div class="tl-yr">1997–09</div>
+        <div class="tl-body">
+          <h4 data-lang="hu">Z Generáció – Az okostelefon generációja</h4>
+          <h4 data-lang="en">Generation Z – The smartphone generation</h4>
+          <p data-lang="hu">Digitális natívak, de emlékeznek az analóg gyerekkor pillanataira. TikTok, mentális egészség, munkahely-rugalmasság. Az Alfák idősebb testvérei.</p>
+          <p data-lang="en">Digital natives who still remember analogue childhood moments. TikTok, mental health, flexible work. Alphas' older siblings.</p>
+        </div>
+      </div>
+      <div class="tl-row reveal">
+        <div class="tl-yr">2010–24</div>
+        <div class="tl-body">
+          <h4 data-lang="hu">⭐ Alfa Generáció – Magyarország jövője</h4>
+          <h4 data-lang="en">⭐ Alpha Generation – Hungary's future</h4>
+          <p data-lang="hu">Az első generáció, amely teljes egészében a 21. században és a digitális korban született. AI-natívak, vizuális gondolkodók, globális polgárok. Ők formálják majd Magyarország jövőjét.</p>
+          <p data-lang="en">The first generation born entirely in the 21st century and the digital age. AI-native, visual thinkers, global citizens. They will shape Hungary's future.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- JÖVŐ -->
+<section id="jovo" class="section">
+  <div class="container">
+    <div class="jovo-grid">
+      <div>
+        <div class="section-header reveal">
+          <div class="section-label" data-lang="hu">Jövőkép</div>
+          <div class="section-label" data-lang="en">Future outlook</div>
+          <h2 class="section-title" data-lang="hu">Hogyan változtatják meg Magyarországot?</h2>
+          <h2 class="section-title" data-lang="en">How will they change Hungary?</h2>
+        </div>
+        <div class="jovo-text reveal reveal-d1">
+          <p data-lang="hu">Az Alfa generáció 2035 körül lép be a magyar munkaerőpiacra – és velük <strong>gyökeresen átíródnak a játékszabályok.</strong> A KSH demográfiai előrejelzései szerint Magyarország komoly munkaerőhiánnyal néz szembe, amelyre az Alfa generáció kínálhat választ.</p>
+          <p data-lang="en">The Alpha generation will enter the Hungarian labour market around 2035 – and with them, <strong>the rules change fundamentally.</strong> KSH forecasts predict Hungary faces serious labour shortages – to which the Alpha generation may be the answer.</p>
+          <p data-lang="hu">Egy olyan generáció érkezik, amely <strong>nem tűri el a rugalmatlan hierarchiákat,</strong> elvárja a technológia maximális integrációját, és értékek alapján választ munkahelyet. A magyar vállalatoknak, amelyek ma nem készülnek fel, holnap versenyhátrányba kerülnek.</p>
+          <p data-lang="en">A generation is coming that <strong>won't tolerate rigid hierarchies,</strong> expects maximum technology integration, and chooses employers based on values. Hungarian companies that don't prepare today will face competitive disadvantage tomorrow.</p>
+        </div>
+      </div>
+      <div class="jovo-list reveal reveal-d2">
+        <div class="jovo-item">
+          <div class="jovo-dot"></div>
+          <div>
+            <h4 data-lang="hu">Átalakuló munkakultúra</h4>
+            <h4 data-lang="en">Transforming work culture</h4>
+            <p data-lang="hu">Hibrid, rugalmas, eredményorientált. Az irodai jelenlét nem lesz elvárás.</p>
+            <p data-lang="en">Hybrid, flexible, results-oriented. Office presence won't be expected.</p>
+          </div>
+        </div>
+        <div class="jovo-item">
+          <div class="jovo-dot"></div>
+          <div>
+            <h4 data-lang="hu">Oktatás átalakulása</h4>
+            <h4 data-lang="en">Education transformation</h4>
+            <p data-lang="hu">A hagyományos tanterv nem elegendő. Projekt alapú, személyre szabott tanulás szükséges.</p>
+            <p data-lang="en">Traditional curriculum isn't enough. Project-based, personalised learning is needed.</p>
+          </div>
+        </div>
+        <div class="jovo-item">
+          <div class="jovo-dot"></div>
+          <div>
+            <h4 data-lang="hu">Korai vállalkozói szemlélet</h4>
+            <h4 data-lang="en">Early entrepreneurial mindset</h4>
+            <p data-lang="hu">Az Alfák sokkal korábban gondolkodnak vállalkozásban. A "biztos állás" más jelentést kap.</p>
+            <p data-lang="en">Alphas think entrepreneurially much earlier. The "safe job" means something different.</p>
+          </div>
+        </div>
+        <div class="jovo-item">
+          <div class="jovo-dot"></div>
+          <div>
+            <h4 data-lang="hu">Fenntarthatóság mint alap</h4>
+            <h4 data-lang="en">Sustainability as baseline</h4>
+            <p data-lang="hu">Nem opcionális CSR – alap elvárás lesz minden munkáltató felé Magyarországon is.</p>
+            <p data-lang="en">Not optional CSR – a baseline expectation for every employer in Hungary too.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- TUDATOS DIÁK -->
+<section id="tudatos" class="section section-alt">
+  <div class="container">
+    <div class="tudatos-block reveal">
+      <div>
+        <div class="tudatos-label" data-lang="hu">Munkalehetőség az Alfa generációnak</div>
+        <div class="tudatos-label" data-lang="en">Career opportunity for the Alpha generation</div>
+        <h3 data-lang="hu">Tudatos Diák</h3>
+        <h3 data-lang="en">Tudatos Diák</h3>
+        <p data-lang="hu">A <strong>Tudatos Diák</strong> platform valódi szakmai tapasztalatot és munkalehetőséget nyújt azoknak a fiataloknak, akik az Alfa generáció képviselőiként szeretnének korán belépni a munka világába – még a diploma előtt.</p>
+        <p data-lang="en">The <strong>Tudatos Diák</strong> platform provides real professional experience and job opportunities for young people who, as Alpha generation representatives, want to enter the world of work early – before graduation.</p>
+      </div>
+      <a href="https://tudatosdiak.hu" target="_blank" rel="noopener" class="tudatos-btn">
+        <span data-lang="hu">Felfedezem</span>
+        <span data-lang="en">Explore</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <a href="#" class="logo">
+    <div class="logo-mark">α</div>
+    <span class="logo-text">Alfa Diák</span>
+  </a>
+  <p data-lang="hu">© 2025 Alfa Diák · Adatok: KSH, OECD PISA 2023, UNICEF, McCrindle Research</p>
+  <p data-lang="en">© 2025 Alfa Diák · Sources: KSH, OECD PISA 2023, UNICEF, McCrindle Research</p>
+</footer>
+
+<script>
+  function toggleTheme() {
+    const html = document.documentElement;
+    const btn = document.getElementById('theme-btn');
+    const isDark = html.dataset.theme === 'dark';
+    html.dataset.theme = isDark ? 'light' : 'dark';
+    btn.textContent = isDark ? '🌙' : '☀️';
+    localStorage.setItem('theme', html.dataset.theme);
+  }
+
+  function setLang(lang) {
+    document.body.classList.toggle('lang-en', lang === 'en');
+    document.getElementById('btn-hu').classList.toggle('active', lang === 'hu');
+    document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+    document.documentElement.lang = lang;
+    localStorage.setItem('lang', lang);
+  }
+
+  // Init
+  const t = localStorage.getItem('theme');
+  if (t) { document.documentElement.dataset.theme = t; document.getElementById('theme-btn').textContent = t === 'light' ? '🌙' : '☀️'; }
+  if (localStorage.getItem('lang') === 'en') setLang('en');
+
+  // Scroll reveal
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }), { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
 </body>
 </html>
